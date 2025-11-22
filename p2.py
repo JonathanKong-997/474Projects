@@ -7,28 +7,30 @@ import sys
 
 #Look - up table
 rows = [
-    [(x, 0) for x in range(3, 11)],
-    [(x, 1) for x in range(2, 12)],
-    [(x, 2) for x in range(1, 13)],
-    [(x, 3) for x in range(0, 14)],
-    [(x, 4) for x in range(0, 14)],
-    [(x, 5) for x in range(1, 13)],
-    [(x, 6) for x in range(2, 12)],
-    [(x, 7) for x in range(3, 11)],
+    [(0, x) for x in range(3, 11)],
+    [(1, x) for x in range(2, 12)],
+    [(2, x) for x in range(1, 13)],
+    [(3, x) for x in range(0, 14)],
+    [(4, x) for x in range(0, 14)],
+    [(5, x) for x in range(1, 13)],
+    [(6, x) for x in range(2, 12)],
+    [(7, x) for x in range(3, 11)],
 ]
 columns = [
-    [(1, 2), (1, 3), (1, 4), (1, 5)],
-    [(2, 1), (2, 2), (2, 3), (2, 4), (2, 5), (2, 6)],
-    [(3, x) for x in range(8)],
-    [(4, x) for x in range(8)],
-    [(5, x) for x in range(8)],
-    [(6, x) for x in range(8)],
-    [(7, x) for x in range(8)],
-    [(8, x) for x in range(8)],
-    [(9, x) for x in range(8)],
-    [(10, x) for x in range(8)],
-    [(11, 1), (11, 2), (11, 3), (11, 4), (11, 5), (11, 6)],
-    [(12, 2), (12, 3), (12, 4), (12, 5)],
+    [(x, 0) for x in range(3, 5)],
+    [(x, 1) for x in range(2, 6)],
+    [(x, 2) for x in range(1, 7)],
+    [(x, 3) for x in range(8)],
+    [(x, 4) for x in range(8)],
+    [(x, 5) for x in range(8)],
+    [(x, 6) for x in range(8)],
+    [(x, 7) for x in range(8)],
+    [(x, 8) for x in range(8)],
+    [(x, 9) for x in range(8)],
+    [(x, 10) for x in range(8)],
+    [(x, 11) for x in range(1, 7)],
+    [(x, 12) for x in range(2, 6)],
+    [(x, 13) for x in range(3, 5)],
 ]
 diagonals = [
     [(4, 0), (5, 1), (6, 2), (7, 3)],
@@ -46,6 +48,7 @@ diagonals = [
     [(0, 8), (1, 9), (2, 10), (3, 11), (4, 12)],
     [(0, 9), (1, 10), (2, 11), (3, 12), (4, 13)],
     [(0, 10), (1, 11), (2, 12), (3, 13)],
+
     [(0, 3), (1, 2), (2, 1), (3, 0)],
     [(0, 4), (1, 3), (2, 2), (3, 1), (4, 0)],
     [(0, 5), (1, 4), (2, 3), (3, 2), (4, 1)],
@@ -100,6 +103,35 @@ allLines = rows+columns+diagonals
 
 def get_legal_moves(board, player):
     #for line in allLines:
+    other_player = 3 - player
+    legal_moves = set()
+    for line in allLines:
+        #print(f"testing line {line}")
+        for i in range(len(line)):
+            #print(f"i = {i}")
+            if board[line[i][0]][line[i][1]] == 0 and line[i] not in legal_moves:
+                #check if you could possibly play here; line has to be some number of other_player followed by player, no 0s allowed
+                added = False
+                #check 1: go forwards in the line if there are 2+ spaces remaining and next space can be flipped
+                if i < len(line) - 2 and board[line[i+1][0]][line[i+1][1]] == other_player:
+                    # go forwards in the line
+                    for j in range(i+1, len(line)):
+                        if board[line[j][0]][line[j][1]] == player:
+                            added = True
+                            legal_moves.add(line[i])
+                            break
+                #check 2: if it wasn't already deemed legal, try going backwards
+                if not added and i >= 2 and board[line[i-1][0]][line[i-1][1]] == other_player:
+                    for j in range(i-1, -1, -1):
+                        if board[line[j][0]][line[j][1]] == player:
+                            added = True
+                            legal_moves.add(line[i])
+                            break
+    return legal_moves
+
+                
+
+
 
     #given a line, look for the current player's token locations
     #searches left and right of said tokens with opponent's tokens in the middle
@@ -118,6 +150,8 @@ def best_move(board, player):
 def apply_move(board, position, player):
     pass
 
+
+# 1 = yours, 2 = opponents
 if __name__ == "__main__":
     board = [ [-1] * 14 for _ in range(8) ]
     extras = [0,1,2,3,3,2,1,0]
