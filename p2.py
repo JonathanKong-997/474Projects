@@ -1,5 +1,5 @@
 import sys
-
+import math
 #program should look through all legal moves of a player 
 
 #cells are horizontal, vertical
@@ -102,7 +102,6 @@ diagonals = [
 allLines = rows+columns+diagonals
 
 def get_legal_moves(board, player):
-    #for line in allLines:
     other_player = 3 - player
     legal_moves = set()
     for line in allLines:
@@ -129,14 +128,13 @@ def get_legal_moves(board, player):
                             break
     return legal_moves
 
-                
-
-
-
-    #given a line, look for the current player's token locations
-    #searches left and right of said tokens with opponent's tokens in the middle
-    #by comparing to board and adding legal moves to a set
-    pass
+empty_squares = {0:3, 1:2, 2:1, 3:0, 4:0, 5:1, 6:2, 7:3}
+def translate_coords(coords):
+    # Translates the coordinates from what would be on a grid to the output format asked.
+    # In the output format, (1, 1) refers to the leftmost green square in the first row. This would be (0, 3) in our model.
+    new_row = coords[0] + 1
+    new_col = coords[1] + empty_squares[coords[0]]
+    return (new_row, new_col)
 
 def best_move(board, player):
     #look 2 turns into the future by using apply move
