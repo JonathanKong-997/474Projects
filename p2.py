@@ -137,7 +137,34 @@ def translate_coords(coords):
     return (new_row, new_col)
 
 def apply_move(board, position, player):
-    pass
+
+    legal_moves = get_legal_moves(board, player)
+    if position not in legal_moves:
+        return None  
+
+    new_board = [row[:] for row in board]
+    opponent = 3 - player
+    directions = [
+        (1, 0), (-1, 0), (0, 1), (0, -1),
+        (1, 1), (-1, -1), (1, -1), (-1, 1)
+    ]
+    r, c = position
+    new_board[r][c] = player
+
+    def is_on_board(row, col):
+        return 0 <= row < 8 and 0 <= col < 14 and new_board[row][col] != -1
+
+    for dr, dc in directions:
+        flips = []
+        row, col = r + dr, c + dc
+        while is_on_board(row, col) and new_board[row][col] == opponent:
+            flips.append((row, col))
+            row += dr
+            col += dc
+        if flips and is_on_board(row, col) and new_board[row][col] == player:
+            for fr, fc in flips:
+                new_board[fr][fc] = player
+    return new_board
 
 def count_value(board, value):
     unfilled = 0
