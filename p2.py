@@ -1,6 +1,6 @@
 import sys
 import math
-# I am in a group with Jonathan Kong and Rishi 
+# I am in a group with Jonathan Kong, Arthur Perng, and Rishi 
 #program should look through all legal moves of a player 
 
 #cells are horizontal, vertical
@@ -219,3 +219,4 @@ if __name__ == "__main__":
                 k += 1
     best = translate_coords(best_move(board, 1))
     print(str(best[0]) + " " + str(best[1]))
+
