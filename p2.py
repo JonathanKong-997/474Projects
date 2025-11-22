@@ -136,18 +136,72 @@ def translate_coords(coords):
     new_col = coords[1] + empty_squares[coords[0]]
     return (new_row, new_col)
 
-def best_move(board, player):
-    #look 2 turns into the future by using apply move
-    #minimax near the end of the game with pruning - 12-14 steps out
-    #prioritize corners
-    #prioritize avoiding squares next to corners
-    #prioritize edges
-    #prioritize moves that minimize opponent's choices and maximize ours
-    pass
-
 def apply_move(board, position, player):
     pass
 
+def count_value(board, value):
+    unfilled = 0
+    for row in board:
+        unfilled += row.count(value)
+    return unfilled
+
+def evaluate_terminal(board, player):
+    return count_value(board, player)
+
+def minimax(board, player, maximizing_player, alpha, beta):
+    legal_moves = get_legal_moves(board, player)
+    #no legal moves for current player, skips
+    if not legal_moves:
+        opponent_moves = get_legal_moves(board, 3 - player)
+        if not opponent_moves:
+            return evaluate_terminal(board, maximizing_player), None
+        return minimax(board, 3 - player, maximizing_player, alpha, beta)
+    #maximize current player board
+    if player == maximizing_player:
+        best_score = -10**9
+        best_move = None
+        for move in legal_moves:
+            new_board = apply_move(board, player, move)
+            score, _ = minimax(new_board, 3 - player, maximizing_player, alpha, beta)
+            if score > best_score:
+                best_score = score
+                best_move = move
+            alpha = max(alpha, best_score)
+            if beta <= alpha:
+                break
+        return best_score, best_move
+    #minimize current player board (opponent's perspective)
+    else:
+        best_score = 10**9
+        best_move = None
+        for move in legal_moves:
+            new_board = apply_move(board, player, move)
+            score, _ = minimax(new_board, 3 - player, maximizing_player, alpha, beta)
+            if score < best_score:
+                best_score = score
+                best_move = move
+            beta = min(beta, best_score)
+            if beta <= alpha:
+                break
+        return best_score, best_move
+
+def heuristic(board, player):
+    return 0 #to do
+
+def best_move(board, player):
+    if count_value(board, 0) < 14:
+        _, move = minimax(board, player, player, -10**9, 10**9)
+        return move
+    else:
+        best_score = -10**9
+        best_move_found = None
+        for move in get_legal_moves(board, player):
+            new_board = apply_move(board, player, move)
+            score = heuristic(new_board, player)
+            if score > best_score:
+                best_score = score
+                best_move_found = move
+        return best_move_found
 
 # 1 = yours, 2 = opponents
 if __name__ == "__main__":
@@ -171,4 +225,5 @@ if __name__ == "__main__":
 
     #print(board)
     get_legal_moves(board, 1)
+
     #print(best_move(board))
