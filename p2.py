@@ -1,5 +1,6 @@
 import sys
 import math
+# I am in a group with Jonathan Kong and Rishi 
 #program should look through all legal moves of a player 
 
 #cells are horizontal, vertical
@@ -100,7 +101,7 @@ def translate_coords(coords):
     # Translates the coordinates from what would be on a grid to the output format asked.
     # In the output format, (1, 1) refers to the leftmost green square in the first row. This would be (0, 3) in our model.
     new_row = coords[0] + 1
-    new_col = coords[1] + empty_squares[coords[0]]
+    new_col = coords[1] - empty_squares[coords[0]] + 1
     return (new_row, new_col)
 
 def apply_move(board, player, position):
@@ -216,5 +217,5 @@ if __name__ == "__main__":
             if left <= c <= right:
                 board[r][c] = vals[k]
                 k += 1
-    best = best_move(board, 1)
+    best = translate_coords(best_move(board, 1))
     print(str(best[0]) + " " + str(best[1]))
