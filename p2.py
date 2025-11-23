@@ -186,24 +186,44 @@ def minimax(board, player, maximizing_player, alpha, beta, depth):
                 break
         return best_score, best_move
 
-def stable(board, player):
-    pass
-
 def heuristic(board, player): 
     #MAJORITY OF THE GRADE
     value = 0
     my_moves = len(get_legal_moves(board, player))
     opp_moves = len(get_legal_moves(board, 3 - player))
 
-    corners = [(0,3), (0, 10), (3, 0), (4,0), (3,13), (4,13), (7,3), (7, 10)]
+    #go for corners, if corner is not owned DON'T go for corner neighbors
+    corner_data = {
+        (0, 3):  [(1, 4), (0, 4), (1, 3), (1,2)],
+        (0, 10): [(1, 9), (0, 9), (1, 10), (1, 11)],
+        (3, 0):  [(4, 1), (2, 1), (3, 1)],
+        (4, 0):  [(3, 1), (5, 1), (4, 1)],
+        (3, 13): [(4, 12), (2, 12), (3, 12)],
+        (4, 13): [(3, 12), (5, 12), (4, 12)],
+        (7, 3):  [(6, 4), (7, 4), (6, 3), (6, 2)],
+        (7, 10): [(6, 9), (7, 9), (6, 10), (6, 11)]
+    }
+
     my_corners = 0
     opp_corners = 0
-    for (r,c) in corners:
-        if board[r][c] == player:
-            my_corners += 1
-        elif board[r][c] == 3 - player:
-            opp_corners += 1
+    my_bad_squares = 0
+    opp_bad_squares = 0
 
+    for corner, bad_neighbors in corner_data.items():
+        c_val = board[corner[0]][corner[1]]
+        
+        if c_val == player:
+            my_corners += 1
+        elif c_val == 3 - player:
+            opp_corners += 1
+        else:
+            for (r, c) in bad_neighbors:
+                if board[r][c] == player:
+                    my_bad_squares += 1
+                elif board[r][c] == 3 - player:
+                    opp_bad_squares += 1
+
+    #avoid pieces that open opportunities for opponent
     my_frontier = 0
     opp_frontier = 0
 
@@ -222,11 +242,16 @@ def heuristic(board, player):
     
     mine = count_value(board, player)
     theirs = count_value(board, 3 - player)
+    if count_value(board, 1) + count_value(board, 2) < 30:
+        early = -10
+    else:
+        early = 5
 
     value += 100 * (my_moves - opp_moves)
-    value += 150 * (my_corners - opp_corners)
+    value += 200 * (my_corners - opp_corners)
+    value -= 80 * (my_bad_squares - opp_bad_squares)
     value -= 50 * (my_frontier - opp_frontier)
-    value += (mine - theirs)
+    value += early* (mine - theirs)
     return value
 
 def best_move(board, player):
