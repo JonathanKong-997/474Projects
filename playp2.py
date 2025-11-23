@@ -249,7 +249,7 @@ def heuristic(board, player):
 
     value += 100 * (my_moves - opp_moves)
     value += 200 * (my_corners - opp_corners)
-    value -= 80 * (my_bad_squares - opp_bad_squares)
+    value -= 200 * (my_bad_squares - opp_bad_squares)
     value -= 50 * (my_frontier - opp_frontier)
     value += early* (mine - theirs)
     return value
@@ -350,4 +350,5 @@ def play_game():
         turn = 3 - turn
 
 if __name__ == "__main__":
+
     play_game()
