@@ -145,21 +145,25 @@ def count_value(board, value):
 def evaluate_terminal(board, player):
     return count_value(board, player)
 
-def minimax(board, player, maximizing_player, alpha, beta):
+def minimax(board, player, maximizing_player, alpha, beta, depth):
     legal_moves = get_legal_moves(board, player)
+    
+    if depth == 0:
+        return heuristic(board, maximizing_player), None
+    
     #no legal moves for current player, skips
     if not legal_moves:
         opponent_moves = get_legal_moves(board, 3 - player)
         if not opponent_moves:
             return evaluate_terminal(board, maximizing_player), None
-        return minimax(board, 3 - player, maximizing_player, alpha, beta)
+        return minimax(board, 3 - player, maximizing_player, alpha, beta, depth - 1)
     #maximize current player board
     if player == maximizing_player:
         best_score = -10**9
         best_move = None
         for move in legal_moves:
             new_board = apply_move(board, player, move)
-            score, _ = minimax(new_board, 3 - player, maximizing_player, alpha, beta)
+            score, _ = minimax(new_board, 3 - player, maximizing_player, alpha, beta, depth - 1)
             if score > best_score:
                 best_score = score
                 best_move = move
@@ -173,7 +177,7 @@ def minimax(board, player, maximizing_player, alpha, beta):
         best_move = None
         for move in legal_moves:
             new_board = apply_move(board, player, move)
-            score, _ = minimax(new_board, 3 - player, maximizing_player, alpha, beta)
+            score, _ = minimax(new_board, 3 - player, maximizing_player, alpha, beta, depth - 1)
             if score < best_score:
                 best_score = score
                 best_move = move
@@ -227,18 +231,11 @@ def heuristic(board, player):
 
 def best_move(board, player):
     if count_value(board, 0) < 14:
-        _, move = minimax(board, player, player, -10**9, 10**9)
+        _, move = minimax(board, player, player, -10**9, 10**9, 20)
         return move
     else:
-        best_score = -10**9
-        best_move_found = None
-        for move in get_legal_moves(board, player):
-            new_board = apply_move(board, player, move)
-            score = heuristic(new_board, player)
-            if score > best_score:
-                best_score = score
-                best_move_found = move
-        return best_move_found
+        _, move = minimax(board, player, player, -10**9, 10**9, 4)
+        return move
 
 # 1 = yours, 2 = opponents
 if __name__ == "__main__":
