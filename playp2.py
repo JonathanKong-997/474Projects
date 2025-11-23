@@ -248,14 +248,14 @@ def heuristic(board, player):
         early = 5
 
     value += 100 * (my_moves - opp_moves)
-    value += 200 * (my_corners - opp_corners)
-    value -= 200 * (my_bad_squares - opp_bad_squares)
+    value += 400 * (my_corners - opp_corners)
+    value -= 80 * (my_bad_squares - opp_bad_squares)
     value -= 50 * (my_frontier - opp_frontier)
     value += early* (mine - theirs)
     return value
 
 def best_move(board, player):
-    if count_value(board, 0) < 14:
+    if count_value(board, 0) < 10:
         _, move = minimax(board, player, player, -10**9, 10**9, 20)
         return move
     else:
@@ -350,5 +350,4 @@ def play_game():
         turn = 3 - turn
 
 if __name__ == "__main__":
-
     play_game()
