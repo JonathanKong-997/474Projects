@@ -104,6 +104,11 @@ def translate_coords(coords):
     new_col = coords[1] - empty_squares[coords[0]] + 1
     return (new_row, new_col)
 
+directions = [
+        (1, 0), (-1, 0), (0, 1), (0, -1),
+        (1, 1), (-1, -1), (1, -1), (-1, 1)
+]
+
 def apply_move(board, player, position):
 
     legal_moves = get_legal_moves(board, player)
@@ -112,10 +117,7 @@ def apply_move(board, player, position):
 
     new_board = [row[:] for row in board]
     opponent = 3 - player
-    directions = [
-        (1, 0), (-1, 0), (0, 1), (0, -1),
-        (1, 1), (-1, -1), (1, -1), (-1, 1)
-    ]
+
     r, c = position
     new_board[r][c] = player
 
@@ -180,8 +182,48 @@ def minimax(board, player, maximizing_player, alpha, beta):
                 break
         return best_score, best_move
 
-def heuristic(board, player):
-    return count_value(board, player)
+def stable(board, player):
+    pass
+
+def heuristic(board, player): 
+    #MAJORITY OF THE GRADE
+    value = 0
+    my_moves = len(get_legal_moves(board, player))
+    opp_moves = len(get_legal_moves(board, 3 - player))
+
+    corners = [(0,3), (0, 10), (3, 0), (4,0), (3,13), (4,13), (7,3), (7, 10)]
+    my_corners = 0
+    opp_corners = 0
+    for (r,c) in corners:
+        if board[r][c] == player:
+            my_corners += 1
+        elif board[r][c] == 3 - player:
+            opp_corners += 1
+
+    my_frontier = 0
+    opp_frontier = 0
+
+    for r in range(8):
+        for c in range(14):
+            if board[r][c] <= 0: continue
+            is_frontier = any(
+                0 <= r+dr < 8 and 0 <= c+dc < 14 and board[r+dr][c+dc] == 0
+                for (dr,dc) in directions
+            )
+            if is_frontier:
+                if board[r][c] == player:
+                    my_frontier += 1
+                elif board[r][c] == 3-player:
+                    opp_frontier += 1
+    
+    mine = count_value(board, player)
+    theirs = count_value(board, 3 - player)
+
+    value += 100 * (my_moves - opp_moves)
+    value += 150 * (my_corners - opp_corners)
+    value -= 50 * (my_frontier - opp_frontier)
+    value += (mine - theirs)
+    return value
 
 def best_move(board, player):
     if count_value(board, 0) < 14:
@@ -217,6 +259,6 @@ if __name__ == "__main__":
             if left <= c <= right:
                 board[r][c] = vals[k]
                 k += 1
+    
     best = translate_coords(best_move(board, 1))
     print(str(best[0]) + " " + str(best[1]))
-
