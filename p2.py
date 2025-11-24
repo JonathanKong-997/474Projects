@@ -214,14 +214,31 @@ def heuristic(board, player):
         
         if c_val == player:
             my_corners += 1
+            for (r, c) in bad_neighbors:
+                if board[r][c] == 0:
+                    my_bad_squares -= 1
         elif c_val == 3 - player:
             opp_corners += 1
+            for (r, c) in bad_neighbors:
+                if board[r][c] == 0:
+                    opp_bad_squares -= 1
         else:
             for (r, c) in bad_neighbors:
                 if board[r][c] == player:
                     my_bad_squares += 1
                 elif board[r][c] == 3 - player:
                     opp_bad_squares += 1
+
+    my_edges = 0
+    opp_edges = 0
+
+    edge_data = [(0, 5), (0,6), (0,7), (0,8), (7,5), (7, 6), (7, 7), (7, 8)]
+    for edge in edge_data:
+        e_val = board[edge[0]][edge[1]]
+        if e_val == player:
+            my_edges += 1
+        elif e_val == 3 - player:
+            opp_edges += 1
 
     #avoid pieces that open opportunities for opponent
     my_frontier = 0
@@ -242,16 +259,18 @@ def heuristic(board, player):
     
     mine = count_value(board, player)
     theirs = count_value(board, 3 - player)
-    if count_value(board, 1) + count_value(board, 2) < 30:
-        early = -10
+    if mine + theirs < 65:
+        value += -20 * (mine - theirs) 
+        value += 700 * (my_corners - opp_corners)
+        value += 100 * (my_moves - opp_moves) 
+        value -= 80 * (my_bad_squares - opp_bad_squares)
+        value -= 20 * (my_frontier - opp_frontier)
     else:
-        early = 5
-
-    value += 100 * (my_moves - opp_moves)
-    value += 400 * (my_corners - opp_corners)
-    value -= 80 * (my_bad_squares - opp_bad_squares)
-    value -= 50 * (my_frontier - opp_frontier)
-    value += early* (mine - theirs)
+        value += 30 * (mine - theirs)
+        value += 900 * (my_corners - opp_corners)
+        value += 50 * (my_moves - opp_moves)
+        value -= 80 * (my_bad_squares - opp_bad_squares)
+        
     return value
 
 def best_move(board, player):
