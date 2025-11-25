@@ -264,7 +264,7 @@ def heuristic(board, player):
     mine = count_value(board, player)
     theirs = count_value(board, 3 - player)
     if mine + theirs < 65:
-        value += -20 * (mine - theirs) 
+        value += -15 * (mine - theirs) 
         value += 700 * (my_corners - opp_corners)
         value += 100 * (my_moves - opp_moves) 
         value -= 80 * (my_bad_squares - opp_bad_squares)
@@ -307,3 +307,4 @@ if __name__ == "__main__":
     
     best = translate_coords(best_move(board, 1))
     print(str(best[0]) + " " + str(best[1]))
+
