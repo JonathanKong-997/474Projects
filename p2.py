@@ -87,12 +87,16 @@ def get_legal_moves(board, player):
                             added = True
                             legal_moves.add(line[i])
                             break
+                        elif board[line[j][0]][line[j][1]] == 0:
+                            break
                 #check 2: if it wasn't already deemed legal, try going backwards
                 if not added and i >= 2 and board[line[i-1][0]][line[i-1][1]] == other_player:
                     for j in range(i-1, -1, -1):
                         if board[line[j][0]][line[j][1]] == player:
                             added = True
                             legal_moves.add(line[i])
+                            break
+                        elif board[line[j][0]][line[j][1]] == 0:
                             break
     return legal_moves
 
