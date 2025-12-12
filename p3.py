@@ -5,6 +5,7 @@ width = 20 #originally 14
 height = 10 #originally 8
 
 rows = [
+    [(0, x) for x in range(9, 11)],
     [(1, x) for x in range(8, 12)],
     [(2, x) for x in range(7, 13)],
     [(3, x) for x in range(6, 14)],
