@@ -35,7 +35,14 @@ columns = [
     [(x, 16) for x in range(6, 10)],
     [(x, 17) for x in range(7, 10)],
 ]
-
+def valid_location(coords):
+    if coords[0] < 0:
+        return False
+    #max col is 10 for row 0, 11 for row 1, etc
+    elif coords[1] > 10+coords[0]:
+        return False
+    return True
+"""
 diagonals = [
     [(2, 7), (3, 8), (4, 9)],
     [(3, 7), (4, 8), (5, 9)],
@@ -77,6 +84,14 @@ diagonals = [
     [(9, 0), (10, 1), (11, 2), (12, 3), (13, 4), (14, 5), (15, 6), (16, 7), (17, 8), (18, 9)],
     [(10, 0), (11, 1), (12, 2), (13, 3), (14, 4), (15, 5), (16, 6), (17, 7), (18, 8), (19, 9)]
 ]
+"""
+diagonals = []
+for i in range(20):
+    diagonals.append([])
+    current = (9, i)
+    while valid_location(current):
+        diagonals[-1].append(current)
+        current = (current[0] - 1, current[1] + 1)
 
 allLines = rows + columns + diagonals
 
@@ -208,7 +223,7 @@ def heuristic(board, player):
 def translate_coords(move):
     new_row = move[0] + 1
     new_col = move[1] + 1
-    new_col += 9-move[0]
+    new_col -= 9-move[0]
     return [new_row, new_col]
 
 def best_move(board, player):
@@ -240,6 +255,6 @@ if __name__ == "__main__":
                 board[r][c] = vals[k]
                 k += 1
 
-    print(board)
-    #best = translate_coords(best_move(board, 1))
-    #print(str(best[0]) + " " + str(best[1]))
+    #print(board)
+    best = translate_coords(best_move(board, 1))
+    print(str(best[0]) + " " + str(best[1]))
