@@ -117,30 +117,39 @@ directions = [
 ]
 
 def apply_move(board, player, position):
-
-    legal_moves = get_legal_moves(board, player)
-    if position not in legal_moves:
-        return None  
-
-    new_board = [row[:] for row in board]
+   # Validate the given position by scanning only from that position
+    r, c = position
     opponent = 3 - player
 
-    r, c = position
-    new_board[r][c] = player
+    def is_on_board_local(row, col):
+        return 0 <= row < height and 0 <= col < width and board[row][col] != -1
 
-    def is_on_board(row, col):
-        return 0 <= row < height and 0 <= col < width and new_board[row][col] != -1
+    # quick checks: must be on board and empty
+    if not is_on_board_local(r, c) or board[r][c] != 0:
+        return None
 
+    total_flips = []
     for dr, dc in directions:
         flips = []
         row, col = r + dr, c + dc
-        while is_on_board(row, col) and new_board[row][col] == opponent:
+        # collect contiguous opponent pieces in this direction
+        while is_on_board_local(row, col) and board[row][col] == opponent:
             flips.append((row, col))
             row += dr
             col += dc
-        if flips and is_on_board(row, col) and new_board[row][col] == player:
-            for fr, fc in flips:
-                new_board[fr][fc] = player
+        # only valid if there's at least one opponent piece and it is terminated by player's piece
+        if flips and is_on_board_local(row, col) and board[row][col] == player:
+            total_flips.extend(flips)
+
+    # if no flips in any direction, move is illegal
+    if not total_flips:
+        return None
+
+    # apply move and flips on a copy
+    new_board = [row[:] for row in board]
+    new_board[r][c] = player
+    for fr, fc in total_flips:
+        new_board[fr][fc] = player
     return new_board
 
 def count_value(board, value):
