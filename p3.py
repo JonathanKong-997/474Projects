@@ -204,7 +204,12 @@ def minimax(board, player, maximizing_player, alpha, beta, depth):
 
 def heuristic(board, player):
     return 0 # TODO
-#def translate_coords(move):
+
+def translate_coords(move):
+    new_row = move[0] + 1
+    new_col = move[1] + 1
+    new_col += 9-move[0]
+    return [new_row, new_col]
 
 def best_move(board, player):
     if count_value(board, 0) < 10:
@@ -214,6 +219,7 @@ def best_move(board, player):
         _, move = minimax(board, player, player, -10**9, 10**9, 4)
         return move
     
+
 # 1 = yours, 2 = opponents
 if __name__ == "__main__":
     board = [ [-1] * width for _ in range(height) ]
