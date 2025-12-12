@@ -218,7 +218,45 @@ def minimax(board, player, maximizing_player, alpha, beta, depth):
         return best_score, best_move
 
 def heuristic(board, player):
-    return 0 # TODO
+    opponent = 3 - player
+    score = 0
+
+    # Material (piece difference)
+    my_pieces = count_value(board, player)
+    opp_pieces = count_value(board, opponent)
+    score += 10 * (my_pieces - opp_pieces)
+
+    # Corner values (only if valid on this board)
+    corners = [(0, 9), (height - 1, 0), (height - 1, width - 1)]
+    rows = len(board)
+    cols = len(board[0]) if rows > 0 else 0
+    for r, c in corners:
+        if 0 <= r < rows and 0 <= c < cols and board[r][c] != -1:
+            if board[r][c] == player:
+                score += 50
+            elif board[r][c] == opponent:
+                score -= 50
+
+    # Edge control heuristic
+    edges_player = edges_opponent = 0
+    for r in range(rows):
+        for c in range(cols):
+            if board[r][c] == -1:
+                continue
+            # consider bottom row and left/right triangle boundaries as edges
+            if r == rows - 1 or c == 0 or c == (10 + r):
+                if board[r][c] == player:
+                    edges_player += 1
+                elif board[r][c] == opponent:
+                    edges_opponent += 1
+    score += 5 * (edges_player - edges_opponent)
+
+    # Late-game parity bonus
+    empty = count_value(board, 0)
+    if empty < 12:
+        score += 2 * (my_pieces - opp_pieces)
+
+    return score
 
 def translate_coords(move):
     new_row = move[0] + 1

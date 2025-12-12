@@ -419,6 +419,18 @@ def play_game():
                 turn = 3 - turn
                 continue
 
+            # Bot: prefer using the provided global `get_legal_moves` implementation.
+            try:
+                bot_legal = get_legal_moves(board, turn)
+            except Exception as exc:
+                print(f"Warning: global get_legal_moves failed ({exc}); falling back to local scanner.")
+                bot_legal = local_get_legal_moves(board, turn)
+
+            if not bot_legal:
+                print("Bot has no move (passing).")
+                turn = 3 - turn
+                continue
+
             # Use provided heuristic to choose the best move among legal options.
             best_move_choice = None
             best_score = None
