@@ -225,26 +225,31 @@ def heuristic(board, player):
     opponent = 3 - player
     score = 0
 
-    # Material (piece difference)
-    my_pieces = count_value(board, player)
-    opp_pieces = count_value(board, opponent)
-    score += 10 * (my_pieces - opp_pieces)
+    corner_adjacent = {
+    (9, 0): [(8, 1), (9, 1)],
+    (9, 19): [(8, 18), (9, 18)],
+    (0, 9): [(1, 8), (1, 9), (1, 10)],
+    (0, 10): [(1, 9), (1, 10), (1, 11)]
+    }
 
-    # Corner values (only if valid on this board)
-    corners = [(0, 9), (height - 1, 0), (height - 1, width - 1)]
-    rows = len(board)
-    cols = len(board[0]) if rows > 0 else 0
-    for r, c in corners:
-        if 0 <= r < rows and 0 <= c < cols and board[r][c] != -1:
-            if board[r][c] == player:
-                score += 50
-            elif board[r][c] == opponent:
-                score -= 50
-
+    for corner, adj_squares in corner_adjacent.items():
+        r_c, c_c = corner
+        if board[r_c][c_c] == 0:
+            for r_a, c_a in adj_squares:
+                if valid_location((r_a, c_a)):
+                    if board[r_a][c_a] == player:
+                        score -= 25  # small bonus for stable adjacent
+                    elif board[r_a][c_a] == opponent:
+                        score += 25
+        else:
+            if board[r_c][c_c] == player:
+                score += 100
+            else:
+                score -= 100
     # Edge control heuristic
     edges_player = edges_opponent = 0
-    for r in range(rows):
-        for c in range(cols):
+    for r in range(height):
+        for c in range(width):
             if board[r][c] == -1:
                 continue
             # consider bottom row and left/right triangle boundaries as edges
@@ -253,13 +258,22 @@ def heuristic(board, player):
                     edges_player += 1
                 elif board[r][c] == opponent:
                     edges_opponent += 1
-    score += 5 * (edges_player - edges_opponent)
+    score += 20 * (edges_player - edges_opponent)
+
+    #Mobility
+    my_moves = len(get_legal_moves(board, player))
+    opp_moves = len(get_legal_moves(board, opponent))
+    score += 5 * (my_moves - opp_moves)
+
+    my_pieces = count_value(board, player)
+    opp_pieces = count_value(board, opponent)
 
     # Late-game parity bonus
     empty = count_value(board, 0)
-    if empty < 12:
+    if empty < 25:
         score += 2 * (my_pieces - opp_pieces)
-
+    else:
+        score -= (my_pieces - opp_pieces)
     return score
 
 def translate_coords(move):
