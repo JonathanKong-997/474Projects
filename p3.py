@@ -39,7 +39,7 @@ def valid_location(coords):
     if coords[0] < 0:
         return False
     #max col is 10 for row 0, 11 for row 1, etc
-    elif coords[1] > 10+coords[0]:
+    elif coords[1] > 10+coords[0] or coords[1] > 9-coords[0]:
         return False
     return True
 """
@@ -93,7 +93,7 @@ for i in range(20):
         diagonals[-1].append(current)
         current = (current[0] - 1, current[1] + 1)
     current = (9, i)
-    while valid_location(current):
+    while valid_location(current):  
         diagonals[-1].append(current)
         current = (current[0] - 1, current[1] - 1)
 
