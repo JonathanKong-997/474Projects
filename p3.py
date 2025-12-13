@@ -92,6 +92,10 @@ for i in range(20):
     while valid_location(current):
         diagonals[-1].append(current)
         current = (current[0] - 1, current[1] + 1)
+    current = (9, i)
+    while valid_location(current):
+        diagonals[-1].append(current)
+        current = (current[0] - 1, current[1] - 1)
 
 allLines = rows + columns + diagonals
 
